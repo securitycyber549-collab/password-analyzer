@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Password Security Analyzer</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial, sans-serif;
+    background:#07111f;
+    color:#e8f1ff;
+    min-height:100vh;
+}
+
+.container{
+    width:92%;
+    max-width:900px;
+    margin:30px auto;
+}
+
+/* Header */
+.header{
+    text-align:center;
+    padding:30px 15px;
+}
+
+.logo{
+    font-size:48px;
+}
+
+.header h1{
+    font-size:30px;
+    margin:10px 0;
+}
+
+.header p{
+    color:#8fa7c4;
+    font-size:15px;
+}
+
+/* Main card */
+.card{
+    background:#0d1b2d;
+    border:1px solid #1d3552;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+}
+
+.label{
+    display:block;
+    margin-bottom:10px;
+    color:#b8c9dd;
+    font-weight:bold;
+}
+
+.password-box{
+    display:flex;
+    gap:10px;
+}
+
+.password-box input{
+    flex:1;
+    min-width:0;
+    padding:15px;
+    border-radius:10px;
+    border:1px solid #294461;
+    background:#07111f;
+    color:white;
+    font-size:16px;
+    outline:none;
+}
+
+.password-box input:focus{
+    border-color:#35d0ff;
+}
+
+.show-btn{
+    padding:0 15px;
+    border:none;
+    border-radius:10px;
+    background:#162a42;
+    color:white;
+    cursor:pointer;
+}
+
+.analyze{
+    width:100%;
+    margin-top:18px;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(90deg,#147dff,#00c6ff);
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.analyze:active{
+    transform:scale(.99);
+}
+
+/* Result */
+.result{
+    display:none;
+    margin-top:25px;
+}
+
+.score-card{
+    text-align:center;
+    background:#081625;
+    border:1px solid #1d3552;
+    border-radius:16px;
+    padding:25px;
+}
+
+.score{
+    font-size:45px;
+    font-weight:bold;
+    margin:10px 0;
+}
+
+.strength{
+    font-size:20px;
+    font-weight:bold;
+}
+
+.meter{
+    width:100%;
+    height:12px;
+    background:#1a2a3c;
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:18px;
+}
+
+.meter-fill{
+    height:100%;
+    width:0%;
+    transition:.5s;
+}
+
+.checks{
+    margin-top:20px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.check{
+    padding:13px;
+    border-radius:10px;
+    background:#101f31;
+    font-size:14px;
+}
+
+.good{
+    color:#36e58b;
+}
+
+.bad{
+    color:#ff6875;
+}
+
+.recommendations{
+    margin-top:20px;
+    background:#101f31;
+    border-radius:12px;
+    padding:18px;
+}
+
+.recommendations h3{
+    margin-bottom:12px;
+}
+
+.recommendations li{
+    margin:8px 0 0 20px;
+    color:#b8c9dd;
+}
+
+/* Privacy */
+.privacy{
+    text-align:center;
+    margin-top:20px;
+    padding:14px;
+    border-radius:10px;
+    background:#0a2230;
+    color:#67d8ff;
+    font-size:13px;
+}
+
+/* Footer */
+.footer{
+    text-align:center;
+    color:#7188a3;
+    font-size:12px;
+    margin:25px 0;
+}
+
+@media(max-width:600px){
+    .header h1{
+        font-size:25px;
+    }
+
+    .card{
+        padding:18px;
+    }
+
+    .checks{
+        grid-template-columns:1fr;
+    }
+
+    .password-box{
+        flex-wrap:wrap;
+    }
+
+    .password-box input{
+        width:100%;
+        flex-basis:100%;
+    }
+
+    .show-btn{
+        width:100%;
+        padding:12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="logo">🔐</div>
+        <h1>Password Strength & Security Analyzer</h1>
+        <p>Analyze your password security and improve your protection.</p>
+    </div>
+
+    <div class="card">
+
+        <label class="label">Enter Password</label>
+
+        <div class="password-box">
+            <input type="password" id="password"
+                   placeholder="Enter your password"
+                   autocomplete="off">
+
+            <button class="show-btn" onclick="togglePassword()">
+                👁 Show
+            </button>
+        </div>
+
+        <button class="analyze" onclick="analyzePassword()">
+            🔍 ANALYZE PASSWORD
+        </button>
+
+        <div class="result" id="result">
+
+            <div class="score-card">
+
+                <p>SECURITY SCORE</p>
+
+                <div class="score" id="score">
+                    0/100
+                </div>
+
+                <div class="strength" id="strength">
+                    -
+                </div>
+
+                <div class="meter">
+                    <div class="meter-fill" id="meter"></div>
+                </div>
+
+            </div>
+
+            <div class="checks" id="checks"></div>
+
+            <div class="recommendations">
+                <h3>💡 Security Recommendations</h3>
+                <ul id="recommendations"></ul>
+            </div>
+
+        </div>
+
+        <div class="privacy">
+            🛡️ Privacy Notice: Your password is analyzed locally and is not stored.
+        </div>
+
+    </div>
+
+    <div class="footer">
+        B.Sc. Cyber Security — Third Year Mini Project
+        <br>
+        Password Strength and Security Analyzer
+    </div>
+
+</div>
+
+<script>
+
+function togglePassword(){
+
+    const input = document.getElementById("password");
+    const button = document.querySelector(".show-btn");
+
+    if(input.type === "password"){
+        input.type = "text";
+        button.innerHTML = "🙈 Hide";
+    }
+    else{
+        input.type = "password";
+        button.innerHTML = "👁 Show";
+    }
+}
+
+
+function analyzePassword(){
+
+    const password = document.getElementById("password").value;
+
+    if(password.length === 0){
+        alert("Please enter a password first.");
+        return;
+    }
+
+    let score = 0;
+    let checks = [];
+    let recommendations = [];
+
+    /* Length */
+    if(password.length >= 12){
+        score += 25;
+        checks.push("✓ Good password length");
+    }
+    else if(password.length >= 8){
+        score += 15;
+        checks.push("✓ Acceptable length");
+        recommendations.push("Use at least 12 characters.");
+    }
+    else{
+        checks.push("✗ Password is too short");
+        recommendations.push("Use at least 12 characters.");
+    }
+
+    /* Uppercase */
+    if(/[A-Z]/.test(password)){
+        score += 15;
+        checks.push("✓ Uppercase letter detected");
+    }
+    else{
+        checks.push("✗ No uppercase letter");
+        recommendations.push("Add at least one uppercase letter.");
+    }
+
+    /* Lowercase */
+    if(/[a-z]/.test(password)){
+        score += 15;
+        checks.push("✓ Lowercase letter detected");
+    }
+    else{
+        checks.push("✗ No lowercase letter");
+        recommendations.push("Add lowercase letters.");
+    }
+
+    /* Number */
+    if(/[0-9]/.test(password)){
+        score += 15;
+        checks.push("✓ Number detected");
+    }
+    else{
+        checks.push("✗ No number");
+        recommendations.push("Add at least one number.");
+    }
+
+    /* Special character */
+    if(/[^A-Za-z0-9]/.test(password)){
+        score += 20;
+        checks.push("✓ Special character detected");
+    }
+    else{
+        checks.push("✗ No special character");
+        recommendations.push("Add a special character such as @, #, $, %, or !.");
+    }
+
+    /* Repeated characters */
+    if(/(.)\1\1/.test(password)){
+        score -= 10;
+        checks.push("✗ Repeated characters detected");
+        recommendations.push("Avoid repeated characters such as aaa or 111.");
+    }
+    else{
+        checks.push("✓ No excessive repetition");
+    }
+
+    /* Common patterns */
+    const commonPatterns = [
+        "password",
+        "123456",
+        "qwerty",
+        "admin",
+        "welcome",
+        "letmein"
+    ];
+
+    if(commonPatterns.some(word =>
+        password.toLowerCase().includes(word)
+    )){
+        score -= 20;
+        checks.push("✗ Common password pattern detected");
+        recommendations.push("Avoid common words and predictable patterns.");
+    }
+    else{
+        checks.push("✓ No obvious common pattern");
+    }
+
+    score = Math.max(0, Math.min(100, score));
+
+    let strength;
+
+    if(score < 40){
+        strength = "WEAK";
+    }
+    else if(score < 60){
+        strength = "MEDIUM";
+    }
+    else if(score < 80){
+        strength = "STRONG";
+    }
+    else{
+        strength = "VERY STRONG";
+    }
+
+    if(recommendations.length === 0){
+        recommendations.push("Excellent! Keep this password unique and do not reuse it.");
+    }
+
+    document.getElementById("result").style.display = "block";
+
+    document.getElementById("score").innerHTML =
+        score + "/100";
+
+    document.getElementById("strength").innerHTML =
+        strength;
+
+    document.getElementById("meter").style.width =
+        score + "%";
+
+    document.getElementById("meter").style.background =
+        score < 40 ? "#ff4757" :
+        score < 60 ? "#ffa502" :
+        score < 80 ? "#2ed573" :
+        "#00d2ff";
+
+    document.getElementById("strength").style.color =
+        score < 40 ? "#ff4757" :
+        score < 60 ? "#ffa502" :
+        score < 80 ? "#2ed573" :
+        "#00d2ff";
+
+    document.getElementById("checks").innerHTML =
+        checks.map(item =>
+            `<div class="check ${item.startsWith("✓") ? "good" : "bad"}">
+                ${item}
+            </div>`
+        ).join("");
+
+    document.getElementById("recommendations").innerHTML =
+        recommendations.map(item =>
+            `<li>${item}</li>`
+        ).join("");
+}
+
+</script>
+
+</body>
+</html>
